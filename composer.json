@@ -1,0 +1,14 @@
+{
+    "require": {
+        "fabpot/goutte": "^3.2",
+        "symfony/console": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "InFinancas\\": "src/infinancas"
+        }
+    },
+    "require-dev": {
+        "symfony/finder": "^3.3"
+    }
+}
