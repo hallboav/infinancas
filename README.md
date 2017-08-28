@@ -21,20 +21,18 @@ php -dphar.readonly=0 bin/compile
 
 git@github.com:hallboav/infinancas.git
 
+### Como usar
 
+```shell
+infinancas.phar 222.222.222-22 bar
+```
 
-Você pode definir usuário e senha no seu ambiente:
+Você também pode definir usuário e senha no seu ambiente:
 
 ```shell
 export IN_FINANCAS_USERNAME=111.111.111-11
 export IN_FINANCAS_PASSWORD=foo
 
-```
-
-Você também pode passá-los por argumentos
-
-```shell
-infinancas.phar 222.222.222-22 bar
 ```
 
 O usuário e senha passados por argumentos têm prioridade sobre as variáveis de ambiente.
