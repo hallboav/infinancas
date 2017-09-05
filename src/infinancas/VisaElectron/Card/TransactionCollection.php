@@ -3,15 +3,30 @@ namespace InFinancas\VisaElectron\Card;
 
 use Symfony\Component\DomCrawler\Crawler;
 
+/**
+ * @author Hallison Boaventura <hallisonboaventura@gmail.com>
+ */
 class TransactionCollection implements \IteratorAggregate
 {
     private $collection;
 
+    /**
+     * Constructor.
+     *
+     * @param array $collection Array of Transaction instances.
+     */
     public function __construct(array $collection)
     {
         $this->collection = $collection;
     }
 
+    /**
+     * Creates a new TransactionCollection instance.
+     *
+     * @param Crawler $crawler Crawler from a transactions page.
+     *
+     * @return TransactionCollection
+     */
     public static function createFromCrawler(Crawler $crawler)
     {
         $collection = [];
@@ -23,12 +38,25 @@ class TransactionCollection implements \IteratorAggregate
         return new self($collection);
     }
 
+    /**
+     * Returns an iterator.
+     *
+     * @return \ArrayIterator
+     */
     public function getIterator()
     {
         return new \ArrayIterator($this->collection);
     }
 
-    public function sortByDate(Transaction $a, Transaction $b)
+    /**
+     * Sorts transactions by date desc.
+     *
+     * @param Transaction $a
+     * @param Transaction $b
+     *
+     * @return int
+     */
+    public function orderByDateDesc(Transaction $a, Transaction $b)
     {
         return $a->getDate() == $b->getDate() ? 0 : ($a->getDate() < $b->getDate() ? 1 : -1);
     }

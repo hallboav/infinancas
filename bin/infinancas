@@ -3,61 +3,16 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Goutte\Client;
+use App\Command\BalanceCommand;
+use App\Command\TransactionsCommand;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputDefinition;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\Table;
 
-use InFinancas\VisaElectron\Authenticator;
-use InFinancas\VisaElectron\ErrorChecker;
+$client = new Client();
+$app = new Application('In Finanças Console Tool', '1.1');
 
-(new Application('In Finanças Console Tool', '1.0.0'))
-    ->register('balance')
-        ->setDefinition(
-            new InputDefinition([
-                new InputArgument('username', InputArgument::OPTIONAL, 'CPF'),
-                new InputArgument('password', InputArgument::OPTIONAL, 'Password')
-            ])
-        )
-        ->setCode(function (InputInterface $input, OutputInterface $output) {
-            if ((null === $username = $input->getArgument('username')) && (false === $username = getenv('IN_FINANCAS_USERNAME'))) {
-                throw new \RuntimeException('Missing username argument and IN_FINANCAS_USERNAME environment variable.');
-            }
+$app->add(new TransactionsCommand($client));
+$balance = new BalanceCommand($client);
+$app->add($balance);
 
-            if ((null === $password = $input->getArgument('password')) && (false === $password = getenv('IN_FINANCAS_PASSWORD'))) {
-                throw new \RuntimeException('Missing password argument and IN_FINANCAS_PASSWORD environment variable.');
-            }
-
-            $output->writeln(sprintf('Trying to authenticate with CPF %s.', $username), OutputInterface::VERBOSITY_VERBOSE);
-
-            $authenticator = new Authenticator(new Client());
-            list($owner, $cards) = $authenticator->authenticate($username, $password);
-
-            $output->writeln(sprintf('%s\'s cards:', $owner), OutputInterface::VERBOSITY_VERBOSE);
-
-            if ($output->isVerbose()) {
-                $table = new Table($output);
-                $table->setHeaders(['Active', 'Balance', 'Card number', 'Color']);
-
-                foreach ($cards as $card) {
-                    $table->addRow([
-                        $card->getIsActive() ? 'YES' : 'NO',
-                        $card->getBalance(),
-                        $card->getNumberFormatted(),
-                        $card->getIsBlue() ? 'BLUE' : 'ORANGE'
-                    ]);
-                }
-
-                $table->render();
-            } else {
-                foreach ($cards as $card) {
-                    $color = $card->getIsActive() ? 'green' : 'yellow';
-                    $output->writeln(sprintf('<fg=%s>%s</>', $color, $card->getBalance()));
-                }
-            }
-        })
-        ->getApplication()
-    ->setDefaultCommand('balance', true)
-    ->run();
+$app->setDefaultCommand($balance->getName());
+$app->run();

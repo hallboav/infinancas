@@ -3,13 +3,24 @@ namespace InFinancas\VisaElectron\Card;
 
 use Symfony\Component\DomCrawler\Crawler;
 
-class Transaction implements \JsonSerializable
+/**
+ * @author Hallison Boaventura <hallisonboaventura@gmail.com>
+ */
+class Transaction
 {
     private $date;
     private $description;
     private $value;
     private $isCredit;
 
+    /**
+     * Constructor.
+     *
+     * @param \DateTime $date        Day the transaction happened.
+     * @param string    $description Usually the name of the entity that provided the service.
+     * @param string    $value       Transaction value.
+     * @param bool      $isCredit    Whether it was credit or not.
+     */
     public function __construct(\DateTime $date, $description, $value, $isCredit)
     {
         $this->date = $date;
@@ -18,21 +29,36 @@ class Transaction implements \JsonSerializable
         $this->isCredit = $isCredit;
     }
 
+    /**
+     * Returns year based on month and day.
+     *
+     * @param string $month
+     * @param string $day
+     *
+     * @return string
+     */
     private static function guessYear($month, $day)
     {
         list($currentYear, $currentMonth) = explode('|', (new \DateTime())->format('Y|m'));
         return $month > $currentMonth ? $currentYear - 1 : $currentYear;
     }
 
-    /*
-     * <tr>
-     *   <td class="td110"><b>16/12</b></td>
-     *   <td class="td390">SUBWAY                   </td>
-     *   <td class="td120"><b> 24,00</b> -</td>
-     * </tr>
+    /**
+     * Creates a new Transaction instance.
+     *
+     * @param Crawler $crawler Crawler from the table row that holds the transaction.
+     *
+     * @return Transaction
      */
     public static function createFromCrawler(Crawler $crawler)
     {
+        // Sample:
+        // <tr>
+        //   <td class="td110"><b>16/12</b></td>
+        //   <td class="td390">SUBWAY                   </td>
+        //   <td class="td120"><b> 24,00</b> -</td>
+        // </tr>
+
         $date = $crawler->filter('td.td110 > b')->first()->text();
         list($day, $month) = explode('/', $date);
         $year = self::guessYear($month, $day);
@@ -46,18 +72,43 @@ class Transaction implements \JsonSerializable
         );
     }
 
+    /**
+     * Returns date the transaction happened.
+     *
+     * @return \DateTime
+     */
     public function getDate()
     {
         return $this->date;
     }
 
-    public function jsonSerialize()
+    /**
+     * Returns value.
+     *
+     * @return string
+     */
+    public function getValue()
     {
-        return [
-            'date' => $this->date->format(\DateTime::ISO8601),
-            'description' => $this->description,
-            'value' => $this->value,
-            'is_credit' => $this->isCredit
-        ];
+        return $this->value;
+    }
+
+    /**
+     * Returns description.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Returns true if value was credit.
+     *
+     * @return bool
+     */
+    public function getIsCredit()
+    {
+        return $this->isCredit;
     }
 }

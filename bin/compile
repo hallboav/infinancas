@@ -36,6 +36,7 @@ class Compiler
         $contents = preg_replace('{^#!/usr/bin/env php\s*}', '', $contents);
         $phar->addFromString($stub->getRelativePathname(), $contents);
 
+        $this->addDir($phar, 'src/app');
         $this->addDir($phar, 'src/infinancas');
         $this->addVendor($phar, 'vendor', ['symfony/finder']);
 
