@@ -19,7 +19,7 @@ infinancas.phar --version
 Os argumentos são username e password (nesta ordem).
 
 ```shell
-infinancas.phar 111.111.111-11 foo
+infinancas.phar balance 111.111.111-11 foo
 ```
 
 Você também pode definir usuário e senha no seu ambiente:
